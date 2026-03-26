@@ -1,0 +1,47 @@
+create a github repository and clone it into your local
+you can also make venv (optional)
+pip install mlflow
+python -m mlflow ui 
+create a python file 
+for run first run in terminal python -m mlflow ui then run code
+do complete data preprocessing upto train_test_split 
+import mlflow,mlflow.sklearn
+mlflow.set_traking_uri("url") (for settting uri)
+mlflow.set_experiment("experiment_name") ..(for new experiment rather than default)
+make params for track or mlflow.autolog() .. (for log autometically)
+with mlflow.start_run():
+    create your ml model
+    1. for normal runing without autolog
+        mlflow.log_params() ..(for loging params)
+        mlflow.log_artrifacts() ..(for loging graphs,photos)
+        mlflow.log_metrics() ..(for logging accuracy)
+        mlflow.set_tags({"ceator":"anmol","editor":"dubey"})  ..(for apply tags)
+        mlflow.sklearn.log_model(rfc)  ..(for logging model)  
+        mlflow.log_artifact(__file__) ..(for python code and auto log do not log autometically)
+
+    2. for hyper tuning only parent
+        param_grid = {"param1":[val1,val2],"param2":[val1,val2]}
+        grid_search = GridSearchCV(estimator=model,param_grid=param_grid,cv = 5,n_jobs=-1,verbose=2)
+        grid_search.fit(xt,yt)
+        best_params = grid_search.best_params_
+        best_score = grid_search.best_score_
+        print(best_params)
+        print(best_score)
+        you can apply autolog or log it mannualy
+        you get log only best_params
+
+    3.for hypertuning as well as all child log
+        just after train_test_split
+        with mlflow.start_run() as parent:
+            modal = RandomForestClassifier(random_state=42)
+            param_grid = {"n_estimators":[10,50,100],"max_depth":[10,20,30]}
+            grid_search = GridSearchCV(estimator=modal,param_grid=param_grid,cv=5,n_jobs=-1,verbose=2)
+            grid_search.fit(xt,yt)
+            for i in range(len(grid_search.cv_results_["params"])):
+                with mlflow.start_run(nested=True) as child:
+                    mlflow.set_tags({"no":i,"abcd": 1*i})
+
+    
+after you can do model registiory versioning and set to stagged or archive
+
+
